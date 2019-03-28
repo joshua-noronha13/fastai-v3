@@ -9,8 +9,8 @@ from fastai import *
 from fastai.vision import *
 
 # export_file_url = 'https://www.dropbox.com/s/v6cuuvddq73d1e0/export.pkl?raw=1'
-export_file_url = 'https://ucf2988ac1f02d26678a0290ec4f.dl.dropboxusercontent.com/cd/0/get/Ad-uFPuWwHPwM2v5n9QUkih5F6Qi9dR8xlykNMPYun-EAehUi-2ViHSBzg5mHqqPMxw2yolcjihWoemngQdC0STE7_gfGuL0Y6nrPTafshWVCuewNWKEBMD8oG0taT4TMsE/file?dl=1#'
-export_file_name = 'foodclassify.pth'
+export_file_url = 'https://uc16e9a1a4b38ba1ba24a1648ba0.dl.dropboxusercontent.com/cd/0/get/Ad_GGnLhEXtO4ow4OFZRamzCP_MvEzDKEWYT9FvgndvvX1mZSyd5P7538RIb5WrI2V0s52EIAxXuO7rQYYfS04c9HOCszjtV3UtS9rsqMiS-e0SNwluhrrX0n_Ho2X5ZQxw/file#'
+export_file_name = 'exportv2.pkl'
 
 classes = ['food', 'notfood']
 path = Path(__file__).parent
