@@ -8,6 +8,11 @@ from io import BytesIO
 from fastai import *
 from fastai.vision import *
 
+# export_file_url = 'https://www.dropbox.com/s/v6cuuvddq73d1e0/export.pkl?raw=1'
+export_file_url = 'https://uc16e9a1a4b38ba1ba24a1648ba0.dl.dropboxusercontent.com/cd/0/get/Ad_GGnLhEXtO4ow4OFZRamzCP_MvEzDKEWYT9FvgndvvX1mZSyd5P7538RIb5WrI2V0s52EIAxXuO7rQYYfS04c9HOCszjtV3UtS9rsqMiS-e0SNwluhrrX0n_Ho2X5ZQxw/file#'
+export_file_name = 'exportv2.pkl'
+
+classes = ['food', 'notfood']
 path = Path(__file__).parent
 
 app = Starlette()
@@ -34,51 +39,23 @@ async def setup_learner():
         else:
             raise
 
-async def setup_learner():
-    await download_file(export_file_url, path/export_file_name)
-    try:
-        learn = load_learner(path, export_file_name)
-        return learn
-    except RuntimeError as e:
-        if len(e.args) > 0 and 'CPU-only machine' in e.args[0]:
-            print(e)
-            message = "\n\nThis model was trained with an old version of fastai and will not work in a CPU environment.\n\nPlease update the fastai library in your training environment and export your model again.\n\nSee instructions for 'Returning to work' at https://course.fast.ai."
-            raise RuntimeError(message)
-        else:
-            raise
-
-model_check_if_food_filename =  "export-food-not-food.pkl"
-model_classify_food_filename = "export-food-type-class.pkl"
-
-model_check_if_food= load_learner(path, model_check_if_food_filename)
-model_classify_food= load_learner(path, model_classify_food_filename)
-
-# loop = asyncio.get_event_loop()
-# tasks = [asyncio.ensure_future(setup_learner())]
-# learn = loop.run_until_complete(asyncio.gather(*tasks))[0]
-# loop.close()
+loop = asyncio.get_event_loop()
+tasks = [asyncio.ensure_future(setup_learner())]
+learn = loop.run_until_complete(asyncio.gather(*tasks))[0]
+loop.close()
 
 @app.route('/')
 def index(request):
     html = path/'view'/'index.html'
     return HTMLResponse(html.open().read())
 
-@app.route('/check_if_food', methods=['POST'])
+@app.route('/analyze', methods=['POST'])
 async def analyze(request):
     data = await request.form()
     img_bytes = await (data['file'].read())
     img = open_image(BytesIO(img_bytes))
-    prediction = model_check_if_food.predict(img)[0]
-    return JSONResponse({'result': str(prediction)})
-
-@app.route('/classify_food', methods=['POST'])
-async def analyze(request):
-    data = await request.form()
-    img_bytes = await (data['file'].read())
-    img = open_image(BytesIO(img_bytes))
-    prediction = model_classify_food.predict(img)[0]
+    prediction = learn.predict(img)[0]
     return JSONResponse({'result': str(prediction)})
 
 if __name__ == '__main__':
     if 'serve' in sys.argv: uvicorn.run(app=app, host='0.0.0.0', port=5042)
-
